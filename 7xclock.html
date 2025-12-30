@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>your life is...</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #000;
+            margin: 0;
+            color: #fff;
+        }
+
+        .container {
+            text-align: center;
+            width: 90%;
+            max-width: 650px;
+        }
+
+        /* 待機モード（赤） */
+        .mode-standby {
+            border: 2px solid #ff3333;
+            box-shadow: 0 0 20px rgba(255, 50, 50, 0.3);
+            background: #1a0000;
+            color: #ff3333;
+        }
+
+        /* 稼働モード（シアン） */
+        .mode-active {
+            border: 2px solid #00ffff;
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+            background: #001a1a;
+            color: #00ffff;
+        }
+
+        /* 箱自体の設定。要素を箱の外枠からどれほど離すか/角丸い度/切り替えアニメーション */
+        .clock-box {
+            padding: 30px;
+            border-radius: 10px;
+            transition: all 0.5s ease;
+        }
+
+        /* １行目の設定。文字サイズ/文字間/バウンディングボックスの下側隙間 */
+        .status-label {
+            font-size: 1.2rem;
+            letter-spacing: 3px;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+        
+        /* 2行目の設定。文字サイズ/バウンディングボックスの上側隙間/不透明度 */
+        .sub-display {
+            font-size: 3rem;
+            opacity: 0.8;
+            margin-top: 10px;
+        }
+
+        
+        /* 時計部分の設定。文字サイズ/バウンディングボックスのサイズ/バウンディングボックスの隙間 */
+        .main-display {
+            font-size: 3rem;
+            line-height: 1.2;
+            margin: 10px 0;
+            font-weight: bold;
+        }
+
+        /* 4行目の設定。文字サイズ/バウンディングボックスの上側隙間/色指定 */
+        .description {
+            font-size: 0.9rem;
+            margin-top: 20px;
+            color: #888;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="clock-container" class="container clock-box mode-standby">
+        <div id="status" class="status-label">SYSTEM STANDBY</div>
+        <div id="date-display" class="sub-display">TARGET: 2026/01/01</div>
+        <div id="time-display" class="main-display">--:--:--</div>
+        <div id="info" class="description">2026年元旦より7倍速稼働を開始します</div>
+    </div>
+
+    <script>
+        // 設定
+        const SPEED = 7;
+        // ターゲット日時：2026年1月1日 00:00:00
+        const START_TIMESTAMP = new Date(2026, 0, 1, 0, 0, 0).getTime();
+
+        function pad(num) { return String(num).padStart(2, '0'); }
+
+        function formatTime(dateObj, showMs) {
+            const h = pad(dateObj.getHours());
+            const m = pad(dateObj.getMinutes());
+            const s = pad(dateObj.getSeconds());
+            let time = `${h}:${m}:${s}`;
+            if (showMs) {
+                time += `.${pad(Math.floor(dateObj.getMilliseconds() / 10))}`;
+            }
+            return time;
+        }
+
+        function updateSystem() {
+            const now = Date.now();
+            const container = document.getElementById('clock-container');
+            
+            // まだ2026年になっていない場合
+            if (now < START_TIMESTAMP) {
+                const diff = START_TIMESTAMP - now;
+                
+                // 残り時間を計算
+                const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+                // 表示更新（赤色の待機モード）
+                container.className = "container clock-box mode-standby";
+                document.getElementById('status').textContent = "COUNTDOWN TO ████";
+                document.getElementById('date-display').textContent = ` `;
+                document.getElementById('time-display').textContent = 
+                    `${days}days ${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
+                document.getElementById('info').textContent = "あなたが████まで。お待ちしております。";
+            } 
+            // 2026年を過ぎている場合（7倍速モード発動）
+            else {
+                // 経過時間（現実）
+                const elapsedReal = now - START_TIMESTAMP;
+                
+                // 経過時間（仮想） = 現実経過時間 × 7
+                const elapsedVirtual = elapsedReal * SPEED;
+
+                // 現在の仮想時刻 = スタート日時 + 仮想経過時間
+                const currentVirtualTime = new Date(START_TIMESTAMP + elapsedVirtual);
+
+                // 日付フォーマット
+                const y = currentVirtualTime.getFullYear();
+                const mo = pad(currentVirtualTime.getMonth() + 1);
+                const d = pad(currentVirtualTime.getDate());
+
+                // 表示更新（シアン色の稼働モード）
+                container.className = "container clock-box mode-active";
+                document.getElementById('status').textContent = " ";
+                document.getElementById('date-display').textContent = `${y}/${mo}/${d}`;
+                document.getElementById('time-display').textContent = formatTime(currentVirtualTime, true);
+                document.getElementById('info').textContent = "あなたは2026年1月1日にこちら側へやってきました。あちら側は今何時何分でしょうか...";
+            }
+        }
+
+        setInterval(updateSystem, 30);
+    </script>
+</body>
+</html>
