@@ -72,9 +72,16 @@
         /* 4行目の設定。文字サイズ/バウンディングボックスの上側隙間/色指定 */
         .description {
             font-size: 0.9rem;
-            margin-top: 20px;
+            margin-top: 10px;
             color: #888;
         }
+
+        .lastnote {
+            font-size: 0.9rem;
+            margin-top: 0px;
+            color: #888;
+        }
+        
     </style>
 </head>
 <body>
@@ -84,6 +91,7 @@
         <div id="date-display" class="sub-display">TARGET: 2026/01/01</div>
         <div id="time-display" class="main-display">--:--:--</div>
         <div id="info" class="description">2026年元旦より7倍速稼働を開始します</div>
+        <div id="lastnote" class="description"> </div>        
     </div>
 
     <script>
@@ -148,12 +156,12 @@
                 document.getElementById('status').textContent = " ";
                 document.getElementById('date-display').textContent = `${y}/${mo}/${d}`;
                 document.getElementById('time-display').textContent = formatTime(currentVirtualTime, true);
-                document.getElementById('info').textContent = "あなたは2026年1月1日にこちら側へやってきました。あちら側は今何時何分でしょうか...";
+                document.getElementById('info').innerHTML = "あなたは２０２６年１月１日に<ruby>こちら側<rt>死者の国</rt>へやってきました。";
+                document.getElementById('lastnote').innerHTML = "<ruby>あちら側<rt>生者の国</rt>は今何時何分でしょうか...";
             }
         }
 
         setInterval(updateSystem, 30);
     </script>
 </body>
-
 </html>
